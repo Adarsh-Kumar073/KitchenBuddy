@@ -53,10 +53,10 @@ npm install
 
 Create a .env.local file:
 
-MONGODB_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_secret_key
-GOOGLE_API_KEY=your_gemini_api_key
-OPENAI_API_KEY=your_openai_api_key   # optional fallback
+-MONGODB_URI=your_mongodb_atlas_connection_string
+-JWT_SECRET=your_secret_key
+-GOOGLE_API_KEY=your_gemini_api_key
+-OPENAI_API_KEY=your_openai_api_key   # optional fallback
 
 ## Run the development server
 npm run dev
