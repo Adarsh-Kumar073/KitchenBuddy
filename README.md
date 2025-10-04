@@ -51,7 +51,7 @@ npm install
 
 ## Configure Environment Variables
 
-Create a .env.local file:
+** Create a .env.local file**
 
 -MONGODB_URI=your_mongodb_atlas_connection_string
 -JWT_SECRET=your_secret_key
