@@ -232,6 +232,14 @@ export default function VoicePage() {
         )}
       </div>
 
+      {/* Cold-start notice */}
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-start gap-2 flex-shrink-0">
+        <span className="text-amber-500 text-sm mt-0.5">⚠️</span>
+        <p className="text-xs text-amber-700 leading-relaxed">
+          The voice server is hosted on <span className="font-semibold">Render free tier</span> — it may take <span className="font-semibold">2–3 minutes</span> to wake up on the first response. Subsequent responses will be faster.
+        </p>
+      </div>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-2xl mx-auto space-y-4">

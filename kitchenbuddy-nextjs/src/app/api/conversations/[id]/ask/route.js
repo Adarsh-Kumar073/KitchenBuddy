@@ -52,7 +52,7 @@ export async function POST(request, { params }) {
     await convo.save();
 
     return new Response(
-      JSON.stringify({ answer, messages: convo.messages }),
+      JSON.stringify({ answer, messages: convo.messages, conversationId: convo._id }),
       { status: 200 }
     );
   } catch (error) {
