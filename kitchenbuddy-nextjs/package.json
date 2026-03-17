@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
     "bcryptjs": "^3.0.2",
     "groq-sdk": "^1.1.1",
     "jsonwebtoken": "^9.0.2",
@@ -18,10 +20,6 @@
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
   },
   "type": "module"
 }
