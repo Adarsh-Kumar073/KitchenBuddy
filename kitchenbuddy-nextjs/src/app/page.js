@@ -24,55 +24,50 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const visited = localStorage.getItem("hasVisited");
-    if(token){
+    if (token) {
       const decoded = jwt.decode(token);
       console.log("Token:", decoded?.email);
       setName(decoded?.email || "User");
     }
-    
 
     if (!token && !visited) {
       localStorage.setItem("hasVisited", "true");
-
       router.push("/signup");
-    }
-    else{
+    } else {
       setCurrentUser(true);
     }
   }, []);
 
-
   const goto_voice = () => {
     router.push("/voiceInput");
-  }
-
-  // ✅ Fetch existing conversations when page loads
-useEffect(() => {
-  if (!currentUser) return;
-
-  const fetchConvos = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("/api/conversations", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Failed to fetch: ${res.status}`);
-      }
-
-      const data = await res.json();
-      setConversations(data);
-
-      if (data.length > 0) setActiveChat(data[0]._id);
-    } catch (err) {
-      console.error("Error fetching conversations:", err);
-    }
   };
 
-  fetchConvos();
-}, [currentUser]);
+  // ✅ Fetch existing conversations when page loads
+  useEffect(() => {
+    if (!currentUser) return;
 
+    const fetchConvos = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/conversations", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setConversations(data);
+
+        if (data.length > 0) setActiveChat(data[0]._id);
+      } catch (err) {
+        console.error("Error fetching conversations:", err);
+      }
+    };
+
+    fetchConvos();
+  }, [currentUser]);
 
   // fetching chat
   useEffect(() => {
@@ -95,8 +90,6 @@ useEffect(() => {
     fetchChat();
   }, [activeChat]);
 
-
-
   // ✅ Create a new chat
   const handleNewChat = async () => {
     try {
@@ -110,10 +103,9 @@ useEffect(() => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ include token
+          Authorization: `Bearer ${token}`,
         },
       });
-
 
       if (!res.ok) throw new Error("Failed to create conversation");
 
@@ -125,8 +117,6 @@ useEffect(() => {
       console.error("Error creating new chat:", err);
     }
   };
-
-
 
   // ✅ Ask Gemini backend
   const get_response = async (e) => {
@@ -156,10 +146,8 @@ useEffect(() => {
     }
   };
 
-
-
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -169,61 +157,76 @@ useEffect(() => {
         conversations={conversations}
         setConversations={setConversations}
         setMessages={setMessages}
-        setName= {setName}
+        setName={setName}
         Name={Name}
       />
 
+      <div className="flex-1 flex flex-col min-w-0">
+        {activeChat ? (
+          <>
+            <MainContent
+              response={response}
+              text={text}
+              messages={messages}
+              loading={loading}
+            />
 
-      {activeChat ? (
-        <MainContent
-          response={response}
-          text={text}
-          messages={messages}
-          loading={loading}
-        />
-
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <div className=" item-center justify-center text-lg pl-[30vw]">
-          </div>
-        </div>
-      )}
-
-
-
-      {activeChat ? (
-        // Input box
-        <div className="mt-4 fixed bottom-0 px-68  h-[20%]  w-[100%] py-10">
-        <div className="flex w-[100%] ">
-          <form ref={formRef} onSubmit={get_response} className="flex border rounded-full w-full">
-            <div className="w-[100%] ">
-              <input
-                type="text"
-                placeholder="Type your message..."
-                onChange={(e) => setText(e.target.value)}
-                className="text-lg overflow-x w-full border-none focus:outline-none focus:ring-0 py-1 px-2 "
-                required
-              />
+            {/* Input Bar */}
+            <div className="border-t border-gray-200 bg-white p-4">
+              <div className="max-w-3xl mx-auto flex items-center gap-2">
+                <form ref={formRef} onSubmit={get_response} className="flex-1 flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+                  <input
+                    type="text"
+                    placeholder="Ask me anything about cooking..."
+                    onChange={(e) => setText(e.target.value)}
+                    className="flex-1 bg-transparent text-sm focus:outline-none text-gray-800 placeholder-gray-400"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="p-1.5 bg-orange-500 hover:bg-orange-600 rounded-full transition-colors disabled:opacity-50 cursor-pointer"
+                    aria-label="Send message"
+                  >
+                    <Image src="/arrow-right (1).png" alt="send" width={18} height={18} />
+                  </button>
+                </form>
+                <button
+                  onClick={goto_voice}
+                  className="p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                  aria-label="Voice input"
+                >
+                  <Image src="/microphone.png" alt="voice" width={22} height={22} />
+                </button>
+              </div>
             </div>
-            <button type="submit" className="text-white px-4 rounded-r float-right cursor-pointer">
-              <Image src="/arrow-right (1).png" alt="arrow icon" width={30} height={30} />
-            </button>
-          </form>
-          <button className="cursor-pointer" onClick={goto_voice}>
-            <Image src="/microphone.png" alt="microphone icon" width={50} height={40} />
-          </button>
-        </div>
-      </div>
-
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <div className=" item-center medium font-mono justify-center text-lg ">
-            Click here to start new <button onClick={handleNewChat} className="text-blue-500 underline font-bold  cursor-pointer">chat</button> /  <button onClick={goto_voice} className="text-blue-500 underline font-bold cursor-pointer">voicechat</button> 
+          </>
+        ) : (
+          /* Empty state */
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
+            <div className="text-center">
+              <div className="text-6xl mb-4">🍳</div>
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome to KitchenBuddy</h1>
+              <p className="text-gray-500 text-sm max-w-sm">Your AI-powered kitchen assistant. Ask about recipes, ingredients, cooking techniques, and more.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleNewChat}
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-full text-sm font-medium transition-colors cursor-pointer"
+              >
+                Start a Chat
+              </button>
+              <button
+                onClick={goto_voice}
+                className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                <Image src="/microphone.png" alt="voice" width={16} height={16} />
+                Voice Chat
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
+        )}
+      </div>
     </div>
   );
 }
-

@@ -1,27 +1,34 @@
-import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import connectMongo from "@/lib/mongodb";
 import Conversation from "@/models/Conversations";
 import mongoose from "mongoose";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 export async function POST(request, { params }) {
   try {
-    const { id } = await params; 
+    const { id } = await params;
     const { query } = await request.json();
     await connectMongo();
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        {
+          role: "system",
+          content: "You are a cooking specialist. Provide step-by-step cooking instructions with timeline.",
+        },
+        {
+          role: "user",
+          content: query,
+        },
+      ],
+    });
 
-    const result = await model.generateContent(
-      `${query}\n\nAssume you are a cooking specialist. Provide step-by-step cooking instructions with timeline.`
-    );
+    const answer = result.choices[0]?.message?.content || "No response";
 
-    const answer = result?.response?.text() || "No response from Gemini";
+    let convo;
 
-     let convo;
-
-    // ✅ If id is not valid  → create a new conversation
     if (!mongoose.Types.ObjectId.isValid(id)) {
       convo = new Conversation({
         title: query.slice(0, 20) || "New Chat",
@@ -36,9 +43,9 @@ export async function POST(request, { params }) {
         });
       }
     }
-    
-    if(convo.title=="New Conversation" || convo.title=="New Chat"){
-      convo.title= query.slice(0,20)
+
+    if (convo.title == "New Conversation" || convo.title == "New Chat") {
+      convo.title = query.slice(0, 20);
     }
     convo.messages.push({ role: "user", text: query });
     convo.messages.push({ role: "bot", text: answer });
@@ -56,4 +63,3 @@ export async function POST(request, { params }) {
     );
   }
 }
-

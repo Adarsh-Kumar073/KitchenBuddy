@@ -1,7 +1,8 @@
 fastapi
 uvicorn
 faster-whisper
-gTTS
-google-generativeai
+edge-tts
+groq
 python-multipart
 numpy
+python-dotenv

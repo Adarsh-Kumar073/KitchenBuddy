@@ -13,7 +13,7 @@ export default function Sidebar({
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/signup"); // redirect if not logged in
+      router.push("/signup");
       return;
     }
 
@@ -29,94 +29,109 @@ export default function Sidebar({
     localStorage.removeItem("token");
     router.push("/signup");
   };
-  
-
 
   return (
-    <aside className={`bg-black text-white flex flex-col h-screen transition-all duration-300
+    <aside className={`bg-gray-900 text-white flex flex-col h-screen transition-all duration-300 flex-shrink-0
       ${isOpen ? "w-64" : "w-16"}`}>
 
       {/* Header */}
-      <nav className="overflow-y-auto p-2 space-y-2 flex">
-        <div className="p-4 border-b border-gray-700 flex items-center">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="absolute top-4 left-4 z-20 text-white px-3 py-1 rounded-md hover:bg-gray-700"
-          >
-            <Image src="/sidebar.png" alt="sidebar icon" width={24} height={24} />
-          </button>
-
-          <div className="mt-8 w-64 font-sans rounded-md px-2 py-2 text-sm font-medium hover:bg-gray-700 flex">
-            <Image src="/icons8-chat-50.png" alt="chat icon" width={24} height={24} />
+      <div className="p-3 border-b border-gray-800 flex items-center gap-2">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg hover:bg-gray-800 transition-colors flex-shrink-0"
+          aria-label="Toggle sidebar"
+        >
+          <Image src="/sidebar.png" alt="sidebar icon" width={20} height={20} />
+        </button>
+        {isOpen && (
+          <>
+            <span className="font-semibold text-orange-400 truncate">KitchenBuddy</span>
             <button
               onClick={handleNewChat}
-              className="ml-1 font-sans rounded px-2 cursor-pointer text-sm font-medium hover:bg-gray-700"
+              className="ml-auto p-2 rounded-lg hover:bg-gray-800 transition-colors flex-shrink-0"
+              aria-label="New chat"
             >
-              {isOpen ? "New Chat" : ""}
+              <Image src="/icons8-chat-50.png" alt="new chat" width={20} height={20} />
             </button>
-          </div>
-        </div>
-      </nav>
+          </>
+        )}
+      </div>
 
       {/* Chat List */}
-      {isOpen && (
-        <nav className="flex-1 overflow-y-auto p-2 space-y-2">
-          {conversations.map(convo => (
-            <div
-              key={convo._id}
-              className={`flex justify-between items-center p-2 rounded cursor-pointer
-                ${activeChat === convo._id ? "bg-gray-700 font-semibold" : "hover:bg-gray-700"}`}
+      <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+        {isOpen ? conversations.map(convo => (
+          <div
+            key={convo._id}
+            className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors
+              ${activeChat === convo._id ? "bg-gray-700" : "hover:bg-gray-800"}`}
+          >
+            <span
+              onClick={() => setActiveChat(convo._id)}
+              className="flex-1 truncate text-sm text-gray-200"
             >
-              <span
-                onClick={() => setActiveChat(convo._id)}
-                className="flex-1 truncate cursor-pointer"
-              >
-                {convo.title || "Untitled Chat"}
-              </span>
-              <button
-                aria-label="Delete conversation"
-                onClick={async () => {
-                  if (!confirm("Are you sure you want to delete this conversation?")) return;
-                  try {
-                    const token = localStorage.getItem("token");
-                    const res = await fetch(`/api/conversations/${convo._id}`, {
-                      method: "DELETE",
-                      headers: { Authorization: `Bearer ${token}` },
-                    });
-                    if (res.ok) {
-                      setConversations(prev => prev.filter(c => c._id !== convo._id));
-                      if (activeChat === convo._id) {
-                        setActiveChat(null);
-                        setMessages([]);
-                      }
+              {convo.title || "Untitled Chat"}
+            </span>
+            <button
+              aria-label="Delete conversation"
+              onClick={async () => {
+                if (!confirm("Delete this conversation?")) return;
+                try {
+                  const token = localStorage.getItem("token");
+                  const res = await fetch(`/api/conversations/${convo._id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  if (res.ok) {
+                    setConversations(prev => prev.filter(c => c._id !== convo._id));
+                    if (activeChat === convo._id) {
+                      setActiveChat(null);
+                      setMessages([]);
                     }
-                  } catch (err) {
-                    console.error("Error deleting conversation:", err);
                   }
-                }}
-                className="text-red-500 cursor-pointer hover:text-red-700 ml-2"
-              >
-                ❌
-              </button>
-            </div>
-          ))}
-        </nav>
-      )}
+                } catch (err) {
+                  console.error("Error deleting conversation:", err);
+                }
+              }}
+              className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-red-400 transition-all flex-shrink-0 ml-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4h6v2"/>
+              </svg>
+            </button>
+          </div>
+        )) : null}
+
+        {!isOpen && (
+          <button
+            onClick={handleNewChat}
+            className="w-full flex justify-center p-2 rounded-lg hover:bg-gray-800 transition-colors mt-1"
+            aria-label="New chat"
+          >
+            <Image src="/icons8-chat-50.png" alt="new chat" width={20} height={20} />
+          </button>
+        )}
+      </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-700 mt-auto">
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 bg-gray-600 rounded-full" />
-          {isOpen && <span className="text-sm">{Name}</span>}
+      <div className="p-3 border-t border-gray-800">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            {Name ? Name[0].toUpperCase() : "U"}
+          </div>
+          {isOpen && (
+            <p className="text-xs text-gray-400 truncate flex-1">{Name}</p>
+          )}
         </div>
-        
         {isOpen && (
-            <button
-              onClick={handleLogout}
-              className="mt-2 w-full bg-red-600 text-white text-sm py-1 rounded hover:bg-red-500 cursor-pointer relative z-10"
-            >
-              Logout
-            </button>
+          <button
+            onClick={handleLogout}
+            className="mt-3 w-full bg-gray-800 hover:bg-red-900 text-gray-300 hover:text-red-300 text-sm py-2 px-3 rounded-lg transition-colors cursor-pointer text-left"
+          >
+            Sign out
+          </button>
         )}
       </div>
     </aside>
