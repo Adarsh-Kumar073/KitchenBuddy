@@ -50,7 +50,7 @@ async def run_llm(history: list) -> str:
     try:
         response = await asyncio.to_thread(
             groq_client.chat.completions.create,
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=history,
         )
         return response.choices[0].message.content
