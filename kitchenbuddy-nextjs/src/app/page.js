@@ -179,6 +179,13 @@ export default function Home() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
+      {/* Mobile backdrop — tap to close sidebar */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
       <Sidebar
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -194,7 +201,7 @@ export default function Home() {
         onShowSignup={() => setShowSignupModal(true)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 w-full">
         {activeChat ? (
           <>
             <MainContent
@@ -208,7 +215,7 @@ export default function Home() {
             <div className="border-t border-gray-200 bg-white p-4">
               {/* Guest banner */}
               {isGuest && (
-                <div className="max-w-3xl mx-auto mb-3 flex items-center justify-between bg-orange-50 border border-orange-200 rounded-xl px-4 py-2">
+                <div className="max-w-3xl mx-auto mb-3 flex flex-wrap items-center justify-between gap-2 bg-orange-50 border border-orange-200 rounded-xl px-4 py-2">
                   <p className="text-xs text-orange-700">
                     <span className="font-semibold">{promptsLeft > 0 ? promptsLeft : 0}</span> free message{promptsLeft !== 1 ? "s" : ""} remaining
                   </p>

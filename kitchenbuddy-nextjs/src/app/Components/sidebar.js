@@ -35,7 +35,10 @@ export default function Sidebar({
 
   return (
     <aside className={`bg-gray-900 text-white flex flex-col h-screen transition-all duration-300 flex-shrink-0
-      ${isOpen ? "w-64" : "w-16"}`}>
+      ${isOpen
+        ? "w-64 fixed inset-y-0 left-0 z-40 md:relative md:inset-auto"
+        : "w-0 overflow-hidden md:w-16 md:overflow-visible"
+      }`}>
 
       {/* Header */}
       <div className="p-3 border-b border-gray-800 flex items-center gap-2">
